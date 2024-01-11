@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/joke_provider.dart';
+import '../widgets/empty_svg_widget.dart';
 import '../widgets/joke_tile.dart';
 
 class JokesPage extends StatelessWidget {
@@ -11,7 +12,7 @@ class JokesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<JokeProvider>().getAllLocalJoke();
+    context.read<JokeProvider>().eitherFailureOrLocalJokes();
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +43,7 @@ class JokesPage extends StatelessWidget {
               },
             );
           }
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: EmptySvg());
         }),
       ),
     );

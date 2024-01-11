@@ -1,3 +1,5 @@
+import 'package:jokes_aside/core/constants/constant.dart';
+
 import '../../../realm/model/joke.dart';
 import '../../../realm/realm_init.dart';
 
@@ -5,15 +7,16 @@ import 'joke_model.dart';
 
 abstract class JokeLocalDataSource {
   Future<void> persistJoke(JokeModel jokeToRealm);
-  Future<Joke> getJokeFromRealm(String id);
-  Future<List<Joke>> getAllJokesFromRealm();
+  Future<JokeModel> getJokeFromRealm({String id = ''});
+  Future<List<JokeModel>> getAllJokesFromRealm();
+  Future<void> deleteJokeFromRealm(String id);
 }
 
 class JokeLocalDataSourceImpl implements JokeLocalDataSource {
   final RealmInit realmInit;
-  
+
   JokeLocalDataSourceImpl({required this.realmInit});
-  
+
   @override
   Future<void> persistJoke(JokeModel jokeToRealm) async {
     final Joke joke = Joke(
@@ -22,27 +25,101 @@ class JokeLocalDataSourceImpl implements JokeLocalDataSource {
       jokeToRealm.punchline,
       jokeToRealm.isFavorite,
     );
-    
+
     try {
-      
       final realm = realmInit.realm;
       realm.write(() {
         realm.add<Joke>(joke);
       });
-      
     } catch (error) {
       throw Exception();
     }
   }
-  
+
   @override
-  Future<Joke> getJokeFromRealm(String id) async {
+  Future<JokeModel> getJokeFromRealm({String id = ''}) async {
+    try {
+        final realm = realmInit.realm;
+        
+      if (id == '') {
+        final result = realm.all<Joke>();
+        final List<Joke> jokes = result.map((e) => e).toList();
+        
+        if (jokes.isNotEmpty) {
+          int index = getRandomIndex(jokes.length);
+          final randomJoke = jokes[index];
+          
+          final JokeModel fetchedJoke = JokeModel(
+            id: randomJoke.id,
+            setup: randomJoke.joke,
+            type: 'general',
+            punchline: randomJoke.punchline,
+            isFavorite: randomJoke.isFavorite,
+          );
+
+          return fetchedJoke;
+        } else {
+          throw Exception();
+        }
+      } else {
+        final Joke? joke = realm.find<Joke>(id);
+
+        if (joke != null) {
+          final JokeModel fetchedJoke = JokeModel(
+            id: joke.id,
+            setup: joke.joke,
+            type: 'general',
+            punchline: joke.punchline,
+            isFavorite: joke.isFavorite,
+          );
+
+          return fetchedJoke;
+        } else {
+          throw Exception();
+        }
+      }
+    } catch (error) {
+      throw Exception();
+    }
+  }
+
+  @override
+  Future<List<JokeModel>> getAllJokesFromRealm() async {
+    try {
+      final realm = realmInit.realm;
+      final result = realm.all<Joke>();
+      final List<Joke> jokes = result.map((e) => e).toList();
+
+      if (jokes.isNotEmpty) {
+        final List<JokeModel> fetchedJokes = jokes
+            .map((e) => JokeModel(
+                  id: e.id,
+                  setup: e.joke,
+                  type: 'general',
+                  punchline: e.punchline,
+                  isFavorite: e.isFavorite,
+                ))
+            .toList();
+
+        return fetchedJokes;
+      } else {
+        throw Exception();
+      }
+    } catch (error) {
+      throw Exception();
+    }
+  }
+
+  @override
+  Future<void> deleteJokeFromRealm(String id) async {
     try {
       final realm = realmInit.realm;
       final Joke? joke = realm.find<Joke>(id);
-      
+
       if (joke != null) {
-        return joke;
+        realm.write(() {
+          realm.delete(joke);
+        });
       } else {
         throw Exception();
       }
@@ -50,23 +127,4 @@ class JokeLocalDataSourceImpl implements JokeLocalDataSource {
       throw Exception();
     }
   }
-  
-  @override
-  Future<List<Joke>> getAllJokesFromRealm() async {
-    try {
-      final realm = realmInit.realm;
-      final result = realm.all<Joke>(); 
-      final List<Joke> jokes = result.map((e) => e).toList();
-      
-      if (jokes.isNotEmpty) {
-        return jokes;
-      } else {
-        throw Exception();
-      }
-    } catch (error) {
-      throw Exception();
-    }
-  }
-  
-  
 }

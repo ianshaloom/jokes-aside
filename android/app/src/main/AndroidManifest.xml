@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Add this line to request permission to access the internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
-        android:label="jokes_aside"
+        android:label="Jokes Aside"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
 import '../../domain/jokes_entity.dart';
+import '../provider/joke_provider.dart';
 
 class JokeTile extends StatelessWidget {
   final JokeEntity joke;
@@ -14,6 +17,9 @@ class JokeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final color = Theme.of(context).colorScheme;
+
+    // final watcher = context.watch<JokeProvider>();
+    final reader = context.read<JokeProvider>();
 
     return Card(
       // elevation: 0,
@@ -52,7 +58,7 @@ class JokeTile extends StatelessWidget {
                     color: Colors.red,
                   ),
                   onPressed: () {
-                    // context.read<JokeProvider>().deleteJoke(joke);
+                    reader.eitherFailureOrDeletedJoke(joke.id);
                   },
                 ),
                 IconButton(

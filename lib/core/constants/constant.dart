@@ -1,4 +1,6 @@
 // server url
+import 'dart:math';
+
 const String serverUrl = 'https://official-joke-api.appspot.com/';
 const String scheme = 'https';
 const String host = 'official-joke-api.appspot.com';
@@ -14,3 +16,10 @@ const String idKey = 'id';
 const String typeKey = 'type';
 const String setupKey = 'setup';
 const String punchlineKey = 'punchline';
+
+// return a number from given list length
+// number should include 0 and exclude list length
+int getRandomIndex(int length) {
+  final Random random = Random();
+  return random.nextInt(length);
+}

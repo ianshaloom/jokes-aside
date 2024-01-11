@@ -10,6 +10,7 @@ class JokeCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Card(
+      elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(18.0),
         child: Column(

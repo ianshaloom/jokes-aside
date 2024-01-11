@@ -17,4 +17,16 @@ class GetJokeUsecase {
   Future<Either<Failure, List<JokeEntity>>> getAllLocalJoke() async {
     return await jokeRepository.getAllLocalJoke();
   }
+  
+  Future<Either<Failure, JokeEntity>> getLocalJokeById(String id) async {
+    return await jokeRepository.getLocalJokeById(id);
+  }
+  
+  Future<Either<Failure, JokeEntity>> saveJokeToRealm(JokeEntity joke) async {
+    return await jokeRepository.saveJokeToRealm(joke);
+  }
+  
+  Future<Either<Failure, JokeEntity>> deleteJokeFromRealm(String id) async {
+    return await jokeRepository.deleteJokeFromRealm(id);
+  }
 }
