@@ -61,15 +61,6 @@ class JokeTile extends StatelessWidget {
                     reader.eitherFailureOrDeletedJoke(joke.id);
                   },
                 ),
-                IconButton(
-                  icon: const Icon(
-                    CupertinoIcons.share,
-                    color: Colors.blue,
-                  ),
-                  onPressed: () {
-                    // context.read<JokeProvider>().shareJoke(joke);
-                  },
-                ),
               ],
             ),
           ],

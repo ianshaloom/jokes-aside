@@ -39,16 +39,15 @@ class JokeLocalDataSourceImpl implements JokeLocalDataSource {
   @override
   Future<JokeModel> getJokeFromRealm({String id = ''}) async {
     try {
-        final realm = realmInit.realm;
-        
+      final realm = realmInit.realm;
+
       if (id == '') {
         final result = realm.all<Joke>();
         final List<Joke> jokes = result.map((e) => e).toList();
-        
+
         if (jokes.isNotEmpty) {
-          int index = getRandomIndex(jokes.length);
-          final randomJoke = jokes[index];
-          
+          final Joke randomJoke = jokesList.getJoke(jokes);
+
           final JokeModel fetchedJoke = JokeModel(
             id: randomJoke.id,
             setup: randomJoke.joke,
@@ -127,4 +126,22 @@ class JokeLocalDataSourceImpl implements JokeLocalDataSource {
       throw Exception();
     }
   }
+}
+
+final JokesList jokesList = JokesList();
+
+class JokesList {
+  int currentIndex = 0;
+
+  // loop thru the list from the beginning while updating currentIndex
+  Joke getJoke(List<Joke> jokes) {
+    if (currentIndex >= jokes.length) {
+      currentIndex = 0;
+    }
+    return jokes[currentIndex++];
+  }
+
+  JokesList._();
+  static final JokesList jokeList = JokesList._();
+  factory JokesList() => jokeList;
 }

@@ -5,41 +5,28 @@ import 'package:provider/provider.dart';
 
 import '../../domain/jokes_entity.dart';
 import '../provider/joke_provider.dart';
+import '../views/jokespage.dart';
 
-class RowButton extends StatefulWidget {
-  final bool isBookmark;
-  final String title;
-  final Function()? onPressed;
-  const RowButton({
+class SaveButton extends StatefulWidget {
+  const SaveButton({
     super.key,
-    required this.title,
-    this.onPressed,
-    required this.isBookmark,
   });
 
   @override
-  State<RowButton> createState() => _RowButtonState();
+  State<SaveButton> createState() => _SaveButtonState();
 }
 
-class _RowButtonState extends State<RowButton> {
-  bool _isBookmark = false;
+class _SaveButtonState extends State<SaveButton> {
+  bool _isBookmarked = false;
   JokeEntity? joke;
 
   void Function(JokeEntity joke)? saved;
   void Function(String id)? unsaved;
 
-  _onPressed(bool isBookmark) async {
-    if (isBookmark) {
-      saveToBookmark();
-    } else {
-      share();
-    }
-  }
-
-  void saveToBookmark() {
+  void _saveToBookmark() {
     debugPrint('saveToBookmark');
 
-    if (_isBookmark) {
+    if (_isBookmarked) {
       unsaved!(joke!.id);
     } else {
       saved!(joke!);
@@ -58,7 +45,7 @@ class _RowButtonState extends State<RowButton> {
     };
 
     joke = reader.jokeEntity;
-    _isBookmark = reader.isBookmark;
+    _isBookmarked = reader.isBookmark;
   }
 
   @override
@@ -70,14 +57,13 @@ class _RowButtonState extends State<RowButton> {
       child: FilledButton(
         onPressed: () async {
           if (reader.jokeEntity == null) {
-            debugPrint('joke is null');
             return;
           }
 
           joke = reader.jokeEntity!;
-          _isBookmark = reader.isBookmark;
-          await _onPressed(widget.isBookmark);
-          _isBookmark = reader.isBookmark;
+          _isBookmarked = reader.isBookmark;
+          _saveToBookmark();
+          _isBookmarked = reader.isBookmark;
         },
         style: FilledButton.styleFrom(
           elevation: 0,
@@ -90,16 +76,14 @@ class _RowButtonState extends State<RowButton> {
         child: Column(
           children: [
             Icon(
-              widget.isBookmark
-                  ? watcher.isBookmark
-                      ? CupertinoIcons.bookmark_fill
-                      : CupertinoIcons.bookmark
-                  : Icons.share,
+              watcher.isBookmark
+                  ? CupertinoIcons.bookmark_fill
+                  : CupertinoIcons.bookmark,
               color: Theme.of(context).colorScheme.onSurface,
             ),
             const SizedBox(height: 5),
             Text(
-              widget.title,
+              'Save Joke',
               style: Theme.of(context).textTheme.labelSmall!.copyWith(
                     fontWeight: FontWeight.w400,
                   ),
@@ -109,10 +93,92 @@ class _RowButtonState extends State<RowButton> {
       ),
     );
   }
+}
 
-  void share() {
-    widget.onPressed!();
+class ShareButton extends StatelessWidget {
+  final Function() onPressed;
+  const ShareButton({super.key, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final reader = context.read<JokeProvider>();
+
+    return Expanded(
+      child: FilledButton(
+        onPressed: () async {
+          if (reader.jokeEntity == null) {
+            return;
+          }
+
+          await onPressed();
+        },
+        style: FilledButton.styleFrom(
+          elevation: 0,
+          enableFeedback: true,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              CupertinoIcons.share,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Share',
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                    fontWeight: FontWeight.w400,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
-  
- 
+}
+
+class ListButton extends StatelessWidget {
+  const ListButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Expanded(
+      child: FilledButton(
+        onPressed: () async {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const JokesPage(),
+            ),
+          );
+        },
+        style: FilledButton.styleFrom(
+          elevation: 0,
+          enableFeedback: true,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              CupertinoIcons.list_bullet_below_rectangle,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'More Jokes',
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                    fontWeight: FontWeight.w400,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

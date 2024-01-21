@@ -38,86 +38,88 @@ class _HomepageState extends State<Homepage> {
     final provider = context.watch<JokeProvider>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Jokes Aside',
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+      /* appBar: AppBar(
         actions: [
           IconButton(
             icon: const Icon(Icons.list),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return const JokesPage();
-              }));
+             
             },
           )
         ],
-      ),
-      body: Column(
-        children: [
-          StreamBuilder(
-            stream: networkInfo.onStatusChange,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final isConnected = snapshot.data;
-                if (isConnected == DataConnectionStatus.connected) {
-                  return const SizedBox(
-                    height: 100,
+      ), */
+      body: Container(
+        margin: const EdgeInsets.only(bottom: 1),
+        decoration: BoxDecoration(
+          color: color.primaryContainer.withOpacity(0.1),
+          borderRadius: const BorderRadius.vertical(
+            bottom: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          children: [
+            StreamBuilder(
+              stream: networkInfo.onStatusChange,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final isConnected = snapshot.data;
+                  if (isConnected == DataConnectionStatus.connected) {
+                    return const SizedBox(
+                      height: 100,
+                    );
+                  }
+                  return Container(
+                    padding: const EdgeInsets.all(15),
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      tileColor: color.tertiaryContainer,
+                      contentPadding: const EdgeInsets.all(10),
+                      leading: Icon(
+                        CupertinoIcons.wifi_slash,
+                        color: color.error,
+                      ),
+                      title: Text(
+                        'Check your Wi-Fi or network connection settings make sure you are connected',
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                              fontWeight: FontWeight.w300,
+                              color: color.onTertiaryContainer,
+                            ),
+                      ),
+                    ),
                   );
                 }
-                return Container(
-                  padding: const EdgeInsets.all(15),
-                  child: ListTile(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    tileColor: color.tertiaryContainer,
-                    contentPadding: const EdgeInsets.all(10),
-                    leading: Icon(
-                      CupertinoIcons.wifi_slash,
-                      color: color.error,
-                    ),
-                    title: Text(
-                      'Check your Wi-Fi or network connection settings make sure you are connected',
-                      style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                            fontWeight: FontWeight.w300,
-                            color: color.onTertiaryContainer,
-                          ),
-                    ),
-                  ),
-                );
-              }
-              return const SizedBox();
-            },
-          ),
-          Center(
-            child: SizedBox(
-              width: size.width * 0.9,
-              child: RepaintBoundary(
-                key: _globalKey,
-                child: (provider.jokeEntity != null)
-                    ? _jokeCard(context, provider.jokeEntity!.setup,
-                        provider.jokeEntity!.punchline)
-                    : (provider.failure != null)
-                        ? Text(
-                            'Something went wrong',
-                            textAlign: TextAlign.center,
-                            style: textTheme.titleMedium!.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: color.error,
+                return const SizedBox();
+              },
+            ),
+            const SizedBox(height: 40),
+            Center(
+              child: SizedBox(
+                width: size.width * 0.9,
+                child: RepaintBoundary(
+                  key: _globalKey,
+                  child: (provider.jokeEntity != null)
+                      ? _jokeCard(context, provider.jokeEntity!.setup,
+                          provider.jokeEntity!.punchline)
+                      : (provider.failure != null)
+                          ? Text(
+                              'Something went wrong',
+                              textAlign: TextAlign.center,
+                              style: textTheme.titleMedium!.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: color.error,
+                              ),
+                            )
+                          : const Center(
+                              child: ArrowSvg(),
+                              // child: Text('No Joke Yet'),
                             ),
-                          )
-                        : const Center(
-                            child: ArrowSvg(),
-                            // child: Text('No Joke Yet'),
-                          ),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         // elevation: 1,
@@ -126,24 +128,17 @@ class _HomepageState extends State<Homepage> {
         icon: const Icon(CupertinoIcons.refresh),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      bottomNavigationBar: SizedBox(
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.only(top: 10),
         height: 50.0,
         child: Row(
           children: [
-            RowButton(
-              isBookmark: false,
-              title: 'Share',
+            SaveButton(
+            ),
+            ShareButton(
               onPressed: () => share(),
             ),
-            const RowButton(
-              isBookmark: true,
-              title: 'Bookmark',
-            ), /* 
-            RowButton(
-              title: 'Save',
-              icon: CupertinoIcons.delete,
-              onPressed: () => null,
-            ), */
+            ListButton(),
 
             // If a location is selected, save the
           ],
@@ -156,10 +151,6 @@ class _HomepageState extends State<Homepage> {
     final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.all(18.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        // borderRadius: BorderRadius.circular(10),
-      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
