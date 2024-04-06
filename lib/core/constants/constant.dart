@@ -23,3 +23,11 @@ int getRandomIndex(int length) {
   final Random random = Random();
   return random.nextInt(length);
 }
+
+
+// svg paths
+/// light
+const String share = 'assets/icons/share.svg';
+
+/// dark
+const String shareDark = 'assets/icons/share-dark.svg';

@@ -36,6 +36,10 @@ class JokeProvider extends ChangeNotifier with JokeProviderMixin {
     networkInfo: NetworkInfoImpl(DataConnectionChecker()),
   );
 
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+  static bool isConnected = false;
+
   bool _isBookmark = false;
   bool get isBookmark => _isBookmark;
   set isBookmark(bool value) {
@@ -45,15 +49,21 @@ class JokeProvider extends ChangeNotifier with JokeProviderMixin {
 
   JokeEntity? jokeEntity;
   Failure? failure;
-  void eitherFailureOrJokeEntity({required String endpoint}) async {
+  Future eitherFailureOrJokeEntity({required String endpoint}) async {
+    // is loading
+    _isLoading = true;
+    notifyListeners();
+
     final failureOrJoke =
         await GetJokeUsecase(jokeRepoImpl).call(endpoint: endpoint);
 
     failureOrJoke.fold((failure) {
       this.failure = failure;
+      _isLoading = false;
       jokeEntity = null;
       notifyListeners();
     }, (joke) {
+      _isLoading = false;
       jokeEntity = joke;
       failure = null;
       _isBookmark = joke.isFavorite;

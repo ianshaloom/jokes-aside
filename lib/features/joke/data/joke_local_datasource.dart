@@ -1,4 +1,3 @@
-import 'package:jokes_aside/core/constants/constant.dart';
 
 import '../../../realm/model/joke.dart';
 import '../../../realm/realm_init.dart';

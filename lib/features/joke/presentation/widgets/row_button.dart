@@ -24,8 +24,6 @@ class _SaveButtonState extends State<SaveButton> {
   void Function(String id)? unsaved;
 
   void _saveToBookmark() {
-    debugPrint('saveToBookmark');
-
     if (_isBookmarked) {
       unsaved!(joke!.id);
     } else {
@@ -85,7 +83,7 @@ class _SaveButtonState extends State<SaveButton> {
             Text(
               'Save Joke',
               style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Gilroy',
                   ),
             ),
           ],
@@ -130,7 +128,7 @@ class ShareButton extends StatelessWidget {
             Text(
               'Share',
               style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Gilroy',
                   ),
             ),
           ],
@@ -145,7 +143,6 @@ class ListButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Expanded(
       child: FilledButton(
         onPressed: () async {
@@ -173,7 +170,7 @@ class ListButton extends StatelessWidget {
             Text(
               'More Jokes',
               style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Gilroy',
                   ),
             ),
           ],

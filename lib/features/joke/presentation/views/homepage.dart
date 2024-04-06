@@ -14,9 +14,9 @@ import '../../../../core/connection/network_info.dart';
 import '../provider/joke_provider.dart';
 import '../widgets/arrow_svg_widget.dart';
 // import '../widgets/joke_card.dart';
+import '../widgets/joke_card.dart';
+import '../widgets/no_internet.dart';
 import '../widgets/row_button.dart';
-
-import 'jokespage.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -38,92 +38,82 @@ class _HomepageState extends State<Homepage> {
     final provider = context.watch<JokeProvider>();
 
     return Scaffold(
-      /* appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.list),
-            onPressed: () {
-             
-            },
-          )
-        ],
-      ), */
-      body: Container(
-        margin: const EdgeInsets.only(bottom: 1),
-        decoration: BoxDecoration(
-          color: color.primaryContainer.withOpacity(0.1),
-          borderRadius: const BorderRadius.vertical(
-            bottom: Radius.circular(20),
+      appBar: AppBar(
+        toolbarHeight: 10,
+      ),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              const Spacer(),
+              Center(
+                child: SizedBox(
+                  width: size.width * 0.9,
+                  child: RepaintBoundary(
+                    key: _globalKey,
+                    child: provider.isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : (provider.jokeEntity != null)
+                            ? JokeCard(
+                                joke: provider.jokeEntity!.setup,
+                                punchline: provider.jokeEntity!.punchline,
+                              )
+                            : (provider.failure != null)
+                                ? Text(
+                                    'Something went wrong',
+                                    textAlign: TextAlign.center,
+                                    style: textTheme.titleMedium!.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: color.error,
+                                      fontFamily: 'Gilroy',
+                                    ),
+                                  )
+                                : const Center(
+                                    child: ArrowSvg(),
+                                    // child: Text('No Joke Yet'),
+                                  ),
+                  ),
+                ),
+              ),
+              const Spacer(),
+            ],
           ),
-        ),
-        child: Column(
-          children: [
-            StreamBuilder(
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: StreamBuilder(
               stream: networkInfo.onStatusChange,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final isConnected = snapshot.data;
                   if (isConnected == DataConnectionStatus.connected) {
+                    JokeProvider.isConnected = true;
                     return const SizedBox(
                       height: 100,
                     );
                   }
-                  return Container(
-                    padding: const EdgeInsets.all(15),
-                    child: ListTile(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      tileColor: color.tertiaryContainer,
-                      contentPadding: const EdgeInsets.all(10),
-                      leading: Icon(
-                        CupertinoIcons.wifi_slash,
-                        color: color.error,
-                      ),
-                      title: Text(
-                        'Check your Wi-Fi or network connection settings make sure you are connected',
-                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                              fontWeight: FontWeight.w300,
-                              color: color.onTertiaryContainer,
-                            ),
-                      ),
-                    ),
-                  );
+
+                  JokeProvider.isConnected = false;
+                  return const NoInternet();
                 }
-                return const SizedBox();
+                return const Center();
               },
             ),
-            const SizedBox(height: 40),
-            Center(
-              child: SizedBox(
-                width: size.width * 0.9,
-                child: RepaintBoundary(
-                  key: _globalKey,
-                  child: (provider.jokeEntity != null)
-                      ? _jokeCard(context, provider.jokeEntity!.setup,
-                          provider.jokeEntity!.punchline)
-                      : (provider.failure != null)
-                          ? Text(
-                              'Something went wrong',
-                              textAlign: TextAlign.center,
-                              style: textTheme.titleMedium!.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: color.error,
-                              ),
-                            )
-                          : const Center(
-                              child: ArrowSvg(),
-                              // child: Text('No Joke Yet'),
-                            ),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         // elevation: 1,
-        label: const Text('Get Joke'),
+        label: const Text(
+          'Get Joke',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         onPressed: () => provider.eitherFailureOrJokeEntity(endpoint: 'any'),
         icon: const Icon(CupertinoIcons.refresh),
       ),
@@ -133,12 +123,14 @@ class _HomepageState extends State<Homepage> {
         height: 50.0,
         child: Row(
           children: [
-            SaveButton(
-            ),
+            const SaveButton(),
             ShareButton(
-              onPressed: () => share(),
+              onPressed: () =>
+                  (provider.isLoading || provider.jokeEntity == null)
+                      ? null
+                      : _share(),
             ),
-            ListButton(),
+            const ListButton(),
 
             // If a location is selected, save the
           ],
@@ -150,6 +142,7 @@ class _HomepageState extends State<Homepage> {
   Widget _jokeCard(BuildContext context, String joke, String punchline) {
     final textTheme = Theme.of(context).textTheme;
     return Container(
+      color: Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.all(18.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -167,11 +160,14 @@ class _HomepageState extends State<Homepage> {
             children: [
               const SizedBox(height: 8),
               Text(
-                punchline,
+                '~ $punchline',
                 style: textTheme.bodyMedium!.copyWith(
                   fontSize: 18,
-                  fontWeight: FontWeight.w400,
+                  fontWeight: FontWeight.w700,
                   fontStyle: FontStyle.italic,
+                  fontFamily: 'Gilroy',
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
             ],
@@ -181,7 +177,7 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  void share() async {
+  void _share() async {
     try {
       final boundary = _globalKey.currentContext!.findRenderObject()
           as RenderRepaintBoundary;
@@ -201,18 +197,3 @@ class _HomepageState extends State<Homepage> {
     }
   }
 }
-/*  // Prompt user to select a save location
-      final savePath = await FilePicker.platform.saveFile(
-        type: FileType.image,
-        allowedExtensions: ['png'],
-        fileName: 'joke-aside.png',
-        initialDirectory: tempDir.path,
-        dialogTitle: 'Save Joke Aside',
-      );
-
-      // If a location is selected, save the image
-      if (savePath != null) {
-        final file = File(savePath);
-        await file.writeAsBytes(pngBytes);
-      }
-       */

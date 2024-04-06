@@ -9,37 +9,43 @@ class JokeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Card(
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              joke,
-              textAlign: TextAlign.center,
-              style: textTheme.titleMedium!.copyWith(
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-              ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10.0),
+      margin: const EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Theme.of(context).colorScheme.surface,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            joke,
+            textAlign: TextAlign.center,
+            style: textTheme.titleMedium!.copyWith(
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
             ),
-            const SizedBox(height: 24),
-            Column(
-              children: [
-                const SizedBox(height: 8),
-                Text(
-                  punchline,
-                  style: textTheme.bodyMedium!.copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    fontStyle: FontStyle.italic,
-                  ),
+          ),
+          const SizedBox(height: 24),
+          Column(
+            children: [
+              const SizedBox(height: 8),
+              Text(
+                '~ $punchline',
+                style: textTheme.bodyMedium!.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  fontStyle: FontStyle.italic,
+                  fontFamily: 'Gilroy',
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
